@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ReactiveSpace } from '@rool-dev/svelte';
   import Markdown from '@humanspeak/svelte-markdown';
+  import ChatDiagramPreviews from './ChatDiagramPreviews.svelte';
 
   interface Props {
     space: ReactiveSpace;
@@ -72,6 +73,9 @@
               <Markdown source={msg.output} />
             {:else}
               <p class="text-sm text-gray-400 italic">Thinking...</p>
+            {/if}
+            {#if msg.modifiedObjectIds?.length}
+              <ChatDiagramPreviews {space} objectIds={msg.modifiedObjectIds} />
             {/if}
           </div>
         </div>

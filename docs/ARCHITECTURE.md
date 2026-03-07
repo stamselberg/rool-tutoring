@@ -98,37 +98,16 @@ Oak National Academy's API uses four question types: `multiple-choice`, `short-a
 
 These are not built yet. Adding them means: new fields in `types.ts`, new input modes in `QuestionScreen.svelte`, new scoring logic in `checkAnswer.ts`. See [VISION.md — Oak National Academy](./VISION.md#oak-national-academy-open-api) for the broader integration story.
 
-### Question images (not yet supported)
+### Question diagrams
 
-Oak's API attaches an optional image to any question type:
+Questions can include diagrams via two fields:
 
-```typescript
-{
-  questionImage: {             // optional, on any question type
-    url: 'https://...',
-    width: 400,
-    height: 300,
-    alt: 'Diagram showing refraction of light through a glass block',
-    attribution: '© Oak National Academy'
-  }
-}
-```
+- `diagramImage` — a Rool media URL, hosted image URL, or object ID referencing an `svg_diagram` object
+- `diagramSvg` — a raw SVG markup string (inline on the question)
 
-Multiple-choice answers can also be images instead of text strings:
+`QuestionScreen.svelte` resolves all three source types and renders them as blob URL `<img>` tags (no XSS risk). See [Diagram Strategy](#diagram-strategy) for generation approaches.
 
-```typescript
-{
-  options: [
-    { type: 'text', content: 'Answer A' },
-    {
-      type: 'image',
-      content: { url: '...', alt: '...', width: 200, height: 150 },
-    },
-  ];
-}
-```
-
-This is a simpler approach than the AI-generated SVG discussed in the Diagram Strategy section. For Oak-sourced questions, images are pre-made and hosted — just render an `<img>` tag. For AI-generated questions, the diagram problem remains open. Both approaches could coexist: `questionImage` for hosted raster images, `diagramSvg` for AI-generated vector diagrams.
+Oak's API also attaches optional images to questions (`questionImage` with `url`, `width`, `height`, `alt`). These would map to `diagramImage` as a hosted URL — Option D in the diagram strategy.
 
 ### Quiz (contract: AI creates after questions, quiz UI reads)
 
@@ -167,7 +146,7 @@ Pure structured data. The app creates this after scoring, stamped with the stude
 
 ### Future fields (added when needed, not now)
 
-- `diagramSvg` / `diagramMeta` on questions — for diagram support (see Diagram Strategy below)
+- `diagram` params on questions — for parameterised diagram components (Option A, not yet built)
 - `status` on questions — for teacher review workflows
 - `tags`, `targetMisconception` on questions — for richer metadata
 - Progress / mastery objects — for structured aggregation beyond what the AI derives from attempts
@@ -201,77 +180,59 @@ graph TD
 ### What was actually built
 
 - **Welcome.svelte** was not built. Topic selection happens in the Chat — the parent tells the AI what they want. This turned out to be more natural than a separate selection screen.
-- **Diagrams** were not built (as planned — text-only for iteration 1).
-- **Chat.svelte** renders AI responses as markdown (via `@humanspeak/svelte-markdown` + `@tailwindcss/typography`). This makes the chat a viable review surface — the parent can see formatted question summaries and tables without reading raw JSON.
+- **Diagrams** were built in iteration 2. `QuestionScreen.svelte` renders diagrams from three sources (SVG strings, media URLs, object ID references) as blob URL `<img>` tags. The chat shows inline diagram previews via `ChatDiagramPreviews.svelte`. See [Diagram Strategy](#diagram-strategy).
+- **Chat.svelte** renders AI responses as markdown (via `@humanspeak/svelte-markdown` + `@tailwindcss/typography`), with inline diagram previews for svg_diagram objects created during the interaction.
 - **QuizFlow.svelte** presents a quiz selection screen (the AI groups questions into named quiz objects), then runs the selected quiz.
 - **Users.svelte** was built for multi-user management — add/remove users by email, link sharing toggle. Only visible to owners/admins.
 - **Per-user conversations** — each user gets their own `conversationId` and AI system instruction. See [Conversations and System Instructions](#conversations-and-system-instructions).
 
-## Diagram Strategy — Decision Not Yet Made
+## Diagram Strategy
 
-Diagrams are important for science tutoring (ray diagrams, wave traces, oscilloscopes). The prototype had hand-crafted SVG components in React. For this app, there are three viable approaches. **We're not picking one yet** — iteration 1 ships with text-only questions, and we'll learn from real usage which approach fits.
+Diagrams are important for science tutoring (ray diagrams, wave traces, oscilloscopes) and increasingly for maths, biology, and other subjects as the app spans ages 7–17. Five approaches were evaluated; three are implemented.
 
-### Option A: Parameterised diagram components
+### The core insight: SVG generation is code generation
 
-Build a library of Svelte components (`RayDiagram`, `WaveDiagram`, etc.) that accept props and render deterministic SVG. The AI picks a component and provides parameters.
+AI image generation (raster/PNG) produces diagrams with fundamental geometric errors — wrong angles, misplaced labels, reversed arrows. This is the "six fingers" problem: diffusion models interpolate pixel patterns, they don't reason about geometry.
 
-```mermaid
-graph LR
-    AI[AI creates question] -->|"diagram: { component: 'ray', angle: 35 }"| DC[DiagramRenderer]
-    DC --> COMP[RayDiagram.svelte]
-    COMP --> SVG[Deterministic SVG]
-```
+AI SVG generation produces structurally correct diagrams (proper curves, grid patterns, markers) but can get the **math wrong** (e.g., a stated wavelength of 4cm not matching the actual geometry). The structure is right; the numbers need checking.
 
-**Pro**: Pixel-perfect, no review needed, fast rendering.
-**Con**: Limited to pre-built types. Adding a new diagram type = dev work. Doesn't scale to new subjects without building new components each time.
+**Accuracy hierarchy**: parameterised components (guaranteed) > AI-generated SVG (structurally sound, math needs checking) > AI-generated raster (unreliable geometry).
 
-### Option B: AI generates SVG directly
+### Options evaluated
 
-The AI generates raw SVG markup as part of the question object. Stored as a string, rendered with `{@html}`. This is what worked in the prototype — Claude generated the JSX/SVG and it was reviewed visually.
+**A — Parameterised components.** Svelte components that accept props and render deterministic SVG. Guaranteed correct, but doesn't scale across subjects — the number of diagram types grows faster than we can build components. Best as a "greatest hits" library for precision-critical types. **Not yet built.**
 
-```mermaid
-graph LR
-    AI[AI creates question] -->|"diagramSvg: '<svg>...</svg>'"| STORE[Stored on object]
-    STORE --> RENDER["Rendered via {@html}"]
-```
+**B — AI-generated SVG (primary approach).** The AI generates SVG markup stored as `svg_diagram` objects or inline `diagramSvg` strings. Rendered as blob URL `<img>` tags (no XSS risk). Unlimited diagram types, works for any subject. Math needs review. **Built and working.**
 
-**Pro**: Unlimited diagram types. Works for any subject. No component library to maintain.
-**Con**: AI-generated SVG can be subtly wrong (coordinates, labels, angles). Needs review — but the review is visual ("does this look right?"), not technical. XSS risk with `{@html}` needs sanitisation.
+**C — External diagram API.** Deferred. Just Option A or B with extra infrastructure.
 
-The key question: **who reviews?** For a technical parent (like you), glancing at the rendered diagram is enough. For a non-technical teacher, they need a clear preview with an explicit "approve this diagram" step. For a student with no reviewer... we'd need to trust the AI or skip diagrams.
+**D — Hosted images.** Pre-made images referenced by URL (e.g., from Oak National Academy). No generation, no review needed. **Built — renders via `diagramImage`.**
 
-### Option C: External diagram API / isolated service
+**E — AI-generated raster via Rool's `{{placeholder}}` syntax.** Useful for illustrative, non-precision diagrams (cell biology, concept maps). Geometry unreliable, not editable, uses credits. **Built — renders via `diagramImage`.**
 
-A separate service (could be self-hosted, third-party, or another AI call) that takes a description like "ray diagram, 35° angle of incidence, mirror, normal line" and returns SVG. The quiz app just consumes the output.
+### Current strategy
 
-```mermaid
-graph LR
-    AI[AI creates question] -->|"diagramMeta: 'ray diagram at 35°'"| API[Diagram API]
-    API --> SVG[Returns SVG]
-    SVG --> STORE[Stored on object]
-```
+| Tier             | Option                       | When to use                                                 | Accuracy                              | Credit cost   |
+| ---------------- | ---------------------------- | ----------------------------------------------------------- | ------------------------------------- | ------------- |
+| **Primary**      | B — AI-generated SVG         | Default for any diagram, across all subjects and ages       | Structurally sound, math needs review | Moderate–High |
+| **Precision**    | A — Parameterised components | High-frequency types where math precision is non-negotiable | Guaranteed correct                    | Minimal       |
+| **Pre-made**     | D — Hosted images            | Oak-sourced or manually uploaded images                     | Pre-vetted                            | None          |
+| **Illustrative** | E — AI-generated raster      | Conceptual diagrams where approximate layout is fine        | Approximate                           | High          |
 
-**Pro**: Clean separation. Could be built as a specialised model/service later. Keeps the quiz app simple.
-**Con**: Another moving part to build/maintain/pay for. Adds latency to question generation. Doesn't exist yet.
+### Known issues and mitigations
 
-### Option D: Hosted raster images (the Oak model)
+**Answer leakage.** AI-generated diagrams consistently label the answer directly on the diagram unless explicitly told not to. The system instruction includes rules requiring `?` labels where the answer would go. Option A avoids this structurally.
 
-Questions reference pre-made images by URL. No generation, no review — the image already exists. This is what Oak National Academy does: a `questionImage` field with `url`, `width`, `height`, `alt`.
+**Model dependency.** SVG quality varies between AI models. The system instruction compensates with explicit SVG quality rules (coordinate consistency, label placement, style guidelines). The Rool backend model can change without notice.
 
-```mermaid
-graph LR
-    SRC[Oak API / uploaded image] -->|"questionImage: { url, alt }"| Q[Question object]
-    Q --> IMG["Rendered as <img>"]
-```
+**Token economics.** No BYOK for Rool credits. SVG is token-heavy. The system instruction aims for first-attempt correctness. Offline batch generation (using a capable model outside Rool to pre-generate SVGs) can sidestep runtime costs.
 
-**Pro**: Dead simple. No AI generation issues. No review needed. Works today.
-**Con**: Only works for questions that already have images. Doesn't help when the AI generates a new question about a concept that needs a diagram. Image coverage in Oak is inconsistent — many Chemistry lessons have no images at all.
+**Review workflow.** `ChatDiagramPreviews.svelte` renders inline diagram previews in the chat after the AI creates `svg_diagram` objects. The Objects panel also shows rendered SVG previews. The parent can review diagrams without leaving the chat or taking the quiz.
 
-### What we're doing now
+### What's left
 
-**Nothing.** Iteration 1 is text-only. The question schema has `diagramSvg` and `diagramMeta` fields ready, but the quiz UI won't render them yet. This is deliberate — we want to validate the tutoring loop before investing in diagrams.
-
-When we do tackle diagrams, we'll probably end up with a mix: Option D (hosted images) for Oak-sourced questions and any uploaded images; Option B (AI-generated SVG) for AI-created questions that need visuals; Option A (parameterised components) for diagram types that must be mathematically precise (oscilloscope readings where students calculate frequency from the trace — the numbers must match the visual).
+- Option A "greatest hits" library: build components for 3–5 precision-critical diagram types as usage patterns emerge
+- Continued prompting refinement for SVG quality (text overflow, coordinate consistency)
 
 ## Quiz Grouping — Solved
 
@@ -317,9 +278,10 @@ Both conversations share the same space, so they see the same question/quiz/atte
 ## What's Built
 
 - **Auth flow** (`App.svelte`): login → space creation/opening → role-based conversation routing
-- **Chat** (`Chat.svelte`): send prompts, display interactions with markdown rendering, auto-scroll
-- **Objects panel** (`Objects.svelte`): reactive collection showing all objects (admin only)
+- **Chat** (`Chat.svelte`): send prompts, display interactions with markdown rendering, auto-scroll, inline diagram previews
+- **Objects panel** (`Objects.svelte`): reactive collection with type-grouped views (quiz, question, svg_diagram, attempt), rendered SVG previews
 - **Header** (`Header.svelte`): mode toggle (Chat, Quiz, Users) with role-based tab visibility
-- **Quiz flow** (`QuizFlow.svelte`): quiz selection → question screens → results with AI feedback
+- **Quiz flow** (`QuizFlow.svelte`): quiz selection → question screens (with diagram rendering) → results with AI feedback
+- **Diagrams**: three rendering paths (SVG strings, media URLs, object ID references), all via blob URL `<img>` tags; inline chat previews; system instruction with SVG quality rules
 - **User management** (`Users.svelte`): add/remove users by email, link sharing (owner/admin only)
 - **Per-user conversations**: role-based routing with separate AI personas for parent and student
