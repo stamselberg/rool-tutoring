@@ -212,12 +212,12 @@ AI SVG generation produces structurally correct diagrams (proper curves, grid pa
 
 ### Current strategy
 
-| Tier | Option | When to use | Accuracy | Credit cost |
-|------|--------|-------------|----------|-------------|
-| **Primary** | B — AI-generated SVG | Default for any diagram, across all subjects and ages | Structurally sound, math needs review | Moderate–High |
-| **Precision** | A — Parameterised components | High-frequency types where math precision is non-negotiable | Guaranteed correct | Minimal |
-| **Pre-made** | D — Hosted images | Oak-sourced or manually uploaded images | Pre-vetted | None |
-| **Illustrative** | E — AI-generated raster | Conceptual diagrams where approximate layout is fine | Approximate | High |
+| Tier             | Option                       | When to use                                                 | Accuracy                              | Credit cost   |
+| ---------------- | ---------------------------- | ----------------------------------------------------------- | ------------------------------------- | ------------- |
+| **Primary**      | B — AI-generated SVG         | Default for any diagram, across all subjects and ages       | Structurally sound, math needs review | Moderate–High |
+| **Precision**    | A — Parameterised components | High-frequency types where math precision is non-negotiable | Guaranteed correct                    | Minimal       |
+| **Pre-made**     | D — Hosted images            | Oak-sourced or manually uploaded images                     | Pre-vetted                            | None          |
+| **Illustrative** | E — AI-generated raster      | Conceptual diagrams where approximate layout is fine        | Approximate                           | High          |
 
 ### Known issues and mitigations
 

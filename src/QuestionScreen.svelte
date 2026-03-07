@@ -28,7 +28,9 @@
     // Priority: direct SVG string on the question
     if (svg) {
       diagramSrc = svgToBlobUrl(svg);
-      return () => { if (diagramSrc) URL.revokeObjectURL(diagramSrc); };
+      return () => {
+        if (diagramSrc) URL.revokeObjectURL(diagramSrc);
+      };
     }
 
     if (!ref) return;
@@ -115,7 +117,9 @@
         class="max-w-full max-h-64 rounded-lg border border-gray-200 mb-5 mx-auto"
       />
     {:else}
-      <div class="h-48 flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200 mb-5">
+      <div
+        class="h-48 flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200 mb-5"
+      >
         <span class="text-gray-400 text-sm">Loading diagram...</span>
       </div>
     {/if}
