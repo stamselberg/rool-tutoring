@@ -1,7 +1,9 @@
 <script lang="ts">
+  import type { ReactiveSpace } from '@rool-dev/svelte';
   import type { Question, Answer } from './types';
 
   interface Props {
+    space: ReactiveSpace;
     question: Question;
     index: number;
     total: number;
@@ -9,7 +11,54 @@
     onAnswer: (value: Answer) => void;
   }
 
-  let { question, index, total, answer, onAnswer }: Props = $props();
+  let { space, question, index, total, answer, onAnswer }: Props = $props();
+
+  // Resolve diagram source: SVG string, media URL, or object ID reference
+  let diagramSrc = $state<string | null>(null);
+
+  function svgToBlobUrl(svg: string): string {
+    return URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+  }
+
+  $effect(() => {
+    diagramSrc = null;
+    const ref = question.diagramImage;
+    const svg = question.diagramSvg;
+
+    // Priority: direct SVG string on the question
+    if (svg) {
+      diagramSrc = svgToBlobUrl(svg);
+      return () => { if (diagramSrc) URL.revokeObjectURL(diagramSrc); };
+    }
+
+    if (!ref) return;
+
+    let cancelled = false;
+
+    if (ref.startsWith('http')) {
+      // Media URL — fetch with auth
+      space.fetchMedia(ref).then(async (res) => {
+        if (cancelled) return;
+        const blob = await res.blob();
+        if (cancelled) return;
+        diagramSrc = URL.createObjectURL(blob);
+      });
+    } else {
+      // Object ID — fetch the referenced object for its svgCode
+      space.getObject(ref).then((obj) => {
+        if (cancelled || !obj) return;
+        const svg = (obj as Record<string, any>).svgCode;
+        if (typeof svg === 'string') {
+          diagramSrc = svgToBlobUrl(svg);
+        }
+      });
+    }
+
+    return () => {
+      cancelled = true;
+      if (diagramSrc) URL.revokeObjectURL(diagramSrc);
+    };
+  });
 
   const TOPIC_COLORS: Record<string, string> = {
     Light: '#f59e0b',
@@ -56,6 +105,21 @@
   <h2 class="text-lg font-semibold text-gray-900 leading-snug mb-5">
     {question.question}
   </h2>
+
+  <!-- Diagram -->
+  {#if question.diagramImage || question.diagramSvg}
+    {#if diagramSrc}
+      <img
+        src={diagramSrc}
+        alt="Diagram for question"
+        class="max-w-full max-h-64 rounded-lg border border-gray-200 mb-5 mx-auto"
+      />
+    {:else}
+      <div class="h-48 flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200 mb-5">
+        <span class="text-gray-400 text-sm">Loading diagram...</span>
+      </div>
+    {/if}
+  {/if}
 
   <!-- Multiple choice -->
   {#if question.questionType === 'mc' && question.options}

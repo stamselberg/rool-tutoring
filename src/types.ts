@@ -12,6 +12,8 @@ export interface Question {
   acceptRange?: [number, number]; // fill only
   explanation: string;
   difficulty: 'foundation' | 'intermediate' | 'higher';
+  diagramImage?: string; // Rool media URL or object ID referencing an svg_diagram object
+  diagramSvg?: string; // Raw SVG markup string
 }
 
 /** A quiz object grouping questions into a discrete set. */

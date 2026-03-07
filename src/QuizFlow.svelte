@@ -172,6 +172,7 @@
     <div class="flex-1">
       {#key currentIndex}
         <QuestionScreen
+          {space}
           question={activeQuestions[currentIndex]}
           index={currentIndex}
           total={activeQuestions.length}

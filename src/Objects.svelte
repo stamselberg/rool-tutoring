@@ -9,6 +9,7 @@
   import QuizView from './objects/QuizView.svelte';
   import QuestionView from './objects/QuestionView.svelte';
   import AttemptView from './objects/AttemptView.svelte';
+  import SvgDiagramView from './objects/SvgDiagramView.svelte';
 
   interface Props {
     space: ReactiveSpace;
@@ -28,7 +29,7 @@
 
   // --- Group objects by type ---
 
-  const KNOWN_TYPES = ['quiz', 'question', 'attempt'] as const;
+  const KNOWN_TYPES = ['quiz', 'question', 'svg_diagram', 'attempt'] as const;
   type KnownType = (typeof KNOWN_TYPES)[number];
 
   interface ObjectGroup {
@@ -65,6 +66,7 @@
   let openGroups = $state<Record<string, boolean>>({
     quiz: true,
     question: true,
+    svg_diagram: true,
     attempt: true,
     _other: true,
   });
@@ -117,6 +119,8 @@
                       <QuizView quiz={obj as unknown as Quiz} />
                     {:else if obj.type === 'question'}
                       <QuestionView question={obj as unknown as Question} />
+                    {:else if obj.type === 'svg_diagram'}
+                      <SvgDiagramView diagram={obj as Record<string, any>} />
                     {:else if obj.type === 'attempt'}
                       <AttemptView attempt={obj as unknown as Attempt} />
                     {/if}

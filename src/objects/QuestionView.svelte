@@ -58,6 +58,13 @@
         {q.subtopic}
       </span>
     {/if}
+    {#if q.diagramImage || q.diagramSvg}
+      <span
+        class="text-[10px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-600"
+      >
+        has diagram
+      </span>
+    {/if}
   </div>
   <p class="text-sm text-gray-800">{q.question}</p>
   {#if q.questionType === 'mc' && q.options}
