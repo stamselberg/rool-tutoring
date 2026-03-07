@@ -23,6 +23,27 @@ export interface Quiz {
   createdAt: number;
 }
 
+/** A quiz attempt recording a student's answers and score. */
+export interface Attempt {
+  id: string;
+  type: 'attempt';
+  quizId: string;
+  studentId: string;
+  studentName: string;
+  studentEmail: string;
+  score: number;
+  total: number;
+  timestamp: number;
+  answers: AttemptAnswer[];
+}
+
+export interface AttemptAnswer {
+  questionId: string;
+  correct: boolean;
+  given?: number | boolean | string;
+  expected?: number | boolean | string;
+}
+
 /** The answer a student gives. Typed per question type. */
 export type Answer = number | boolean | string | null;
 
