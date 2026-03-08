@@ -1,4 +1,5 @@
 <script lang="ts">
+  import 'katex/dist/katex.min.css';
   import Markdown from '@humanspeak/svelte-markdown';
   import katex from 'katex';
   import 'katex/contrib/mhchem';
@@ -16,9 +17,15 @@
 
 <Markdown {source} {extensions} {isInline}>
   {#snippet inlineKatex(props)}
-    {@html katex.renderToString(props.text, { displayMode: false, throwOnError: false })}
+    {@html katex.renderToString(props.text, {
+      displayMode: false,
+      throwOnError: false,
+    })}
   {/snippet}
   {#snippet blockKatex(props)}
-    {@html katex.renderToString(props.text, { displayMode: true, throwOnError: false })}
+    {@html katex.renderToString(props.text, {
+      displayMode: true,
+      throwOnError: false,
+    })}
   {/snippet}
 </Markdown>
