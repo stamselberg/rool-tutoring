@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ReactiveSpace } from '@rool-dev/svelte';
   import type { Question, Answer } from './types';
+  import RichText from './RichText.svelte';
 
   interface Props {
     space: ReactiveSpace;
@@ -105,7 +106,7 @@
 
   <!-- Question text -->
   <h2 class="text-lg font-semibold text-gray-900 leading-snug mb-5">
-    {question.question}
+    <RichText source={question.question} isInline />
   </h2>
 
   <!-- Diagram -->
@@ -148,7 +149,7 @@
           >
             {String.fromCharCode(65 + i)}
           </span>
-          <span class="text-gray-800">{opt}</span>
+          <span class="text-gray-800"><RichText source={opt} isInline /></span>
         </button>
       {/each}
     </div>

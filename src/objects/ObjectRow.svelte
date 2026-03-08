@@ -2,6 +2,7 @@
   import type { ReactiveSpace, RoolObject } from '@rool-dev/svelte';
   import type { Snippet } from 'svelte';
   import { formatTime, objectSummary } from './utils';
+  import RichText from '../RichText.svelte';
 
   interface Props {
     obj: RoolObject;
@@ -43,7 +44,7 @@
         : ''}">&triangleright;</span
     >
     <span class="flex-1 text-xs text-gray-600 truncate" title={obj.id}>
-      {objectSummary(obj)}
+      <RichText source={objectSummary(obj)} isInline />
     </span>
     {#if typeof obj.type === 'string' && !view}
       <span class="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">

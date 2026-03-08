@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Question } from '../types';
+  import RichText from '../RichText.svelte';
 
   interface Props {
     question: Question;
@@ -66,12 +67,12 @@
       </span>
     {/if}
   </div>
-  <p class="text-sm text-gray-800">{q.question}</p>
+  <p class="text-sm text-gray-800"><RichText source={q.question} isInline /></p>
   {#if q.questionType === 'mc' && q.options}
     <ol class="text-xs text-gray-600 space-y-0.5 ml-4 list-[upper-alpha]">
       {#each q.options as opt, i}
         <li class={i === q.correctAnswer ? 'font-semibold text-green-700' : ''}>
-          {opt}
+          <RichText source={opt} isInline />
         </li>
       {/each}
     </ol>
@@ -81,7 +82,7 @@
     </p>
   {:else if q.questionType === 'fill'}
     <p class="text-xs text-green-700 font-medium">
-      Answer: {q.correctAnswer}
+      Answer: <RichText source={String(q.correctAnswer)} isInline />
     </p>
     {#if q.acceptAlternatives?.length}
       <p class="text-[10px] text-gray-400">
@@ -91,6 +92,6 @@
   {/if}
   <details class="text-xs text-gray-500">
     <summary class="cursor-pointer hover:text-gray-700">Explanation</summary>
-    <p class="mt-1">{q.explanation}</p>
+    <p class="mt-1"><RichText source={q.explanation} isInline /></p>
   </details>
 </div>
