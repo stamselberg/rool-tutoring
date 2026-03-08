@@ -2,6 +2,7 @@
   import type { ReactiveSpace, Rool } from '@rool-dev/svelte';
   import type { Question, Answer } from './types';
   import { checkAnswer } from './checkAnswer';
+  import RichText from './RichText.svelte';
 
   interface Props {
     space: ReactiveSpace;
@@ -192,9 +193,11 @@
         <span class="text-sm">Analysing your answers...</span>
       </div>
     {:else if aiFeedback}
-      <p class="text-sm text-blue-900 leading-relaxed whitespace-pre-wrap">
-        {aiFeedback}
-      </p>
+      <div
+        class="text-sm text-blue-900 leading-relaxed prose prose-sm prose-blue max-w-none"
+      >
+        <RichText source={aiFeedback} />
+      </div>
     {:else if score === total}
       <p class="text-sm text-blue-900 leading-relaxed">
         Amazing work! You got every single question right. Keep it up!
@@ -227,13 +230,22 @@
               Q{i + 1}
               {r.isCorrect ? '\u2713' : '\u2717'}
             </span>
-            <span class="text-gray-500">{r.question}</span>
+            <span class="text-gray-500"
+              ><RichText source={r.question} isInline /></span
+            >
           </div>
           {#if !r.isCorrect}
             <div class="mt-1.5 text-xs">
-              <span class="text-red-600">Your answer: {formatAnswer(r)}</span>
+              <span class="text-red-600"
+                >Your answer: <RichText
+                  source={formatAnswer(r)}
+                  isInline
+                /></span
+              >
               <span class="text-gray-400 mx-2">&rarr;</span>
-              <span class="text-green-600">Correct: {formatCorrect(r)}</span>
+              <span class="text-green-600"
+                >Correct: <RichText source={formatCorrect(r)} isInline /></span
+              >
             </div>
           {/if}
         </div>

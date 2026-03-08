@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { ReactiveSpace } from '@rool-dev/svelte';
-  import Markdown from '@humanspeak/svelte-markdown';
+  import RichText from './RichText.svelte';
   import ChatDiagramPreviews from './ChatDiagramPreviews.svelte';
 
   interface Props {
@@ -70,7 +70,7 @@
             class="max-w-[75%] bg-white border border-gray-200 rounded-2xl rounded-bl-sm px-4 py-2 shadow-sm prose prose-sm prose-gray max-w-none"
           >
             {#if msg.output}
-              <Markdown source={msg.output} />
+              <RichText source={msg.output} />
             {:else}
               <p class="text-sm text-gray-400 italic">Thinking...</p>
             {/if}

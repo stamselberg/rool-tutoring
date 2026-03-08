@@ -40,6 +40,22 @@ Quality rules:
 - Vary question types within a set — don't make them all multiple choice
 - Match difficulty to the key stage discussed with the parent
 
+## Scientific notation and formulas
+
+The quiz UI renders LaTeX via KaTeX. Use \`$...$\` for any formula or scientific notation in question text, answer options, and explanations.
+
+Chemistry — use \`$\\ce{...}$\` for chemical notation:
+- \`$\\ce{H2O}$\` → H₂O, \`$\\ce{H2SO4}$\` → H₂SO₄
+- \`$\\ce{Na+}$\` → Na⁺, \`$\\ce{SO4^{2-}}$\` → SO₄²⁻
+- \`$\\ce{2H2 + O2 -> 2H2O}$\` → balanced equation
+
+Physics and maths — standard LaTeX:
+- \`$v = f \\lambda$\`, \`$E = mc^2$\`, \`$m/s^2$\`
+
+Example question: \`"What is the chemical formula for sulfuric acid?"\` with options like \`$\\ce{H2SO4}$\`, \`$\\ce{HCl}$\`, \`$\\ce{NaOH}$\`, \`$\\ce{HNO3}$\`
+
+Do NOT use LaTeX for plain text or simple numbers.
+
 ## Creating a quiz
 
 After creating all the question objects, create ONE quiz object to group them. The quiz UI needs this to know which questions belong together.
@@ -98,7 +114,9 @@ Set diagramSvg directly on the question object to an SVG string. Use this for si
 
 4. **No text overflow.** Labels must fit within the viewBox. Test that text doesn't clip at edges.
 
-5. **One diagram per concept.** Don't cram multiple diagrams into one SVG. If a question needs a before/after comparison, use two separate diagram objects.
+5. **Numbered labels must be large and legible.** When using numbered circles or callouts to identify parts of a diagram, make the text large (at least 16px) and the containing circle noticeably larger than the text so numbers sit clearly inside. These diagrams are viewed on mobile screens — small labels are unreadable.
+
+6. **One diagram per concept.** Don't cram multiple diagrams into one SVG. If a question needs a before/after comparison, use two separate diagram objects.
 
 ### When to include diagrams
 
