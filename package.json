@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "@humanspeak/svelte-markdown": "^1.0.3",
-    "@rool-dev/sdk": "^0.1.16",
-    "@rool-dev/svelte": "^0.1.12",
+    "@rool-dev/sdk": "^0.2.0",
+    "@rool-dev/svelte": "^0.2.0",
     "@tailwindcss/typography": "^0.5.19",
     "katex": "^0.16.37",
     "marked-katex-extension": "^5.1.7"
