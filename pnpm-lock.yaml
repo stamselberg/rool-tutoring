@@ -12,11 +12,11 @@ importers:
         specifier: ^1.0.3
         version: 1.0.3(svelte@5.53.7)
       '@rool-dev/sdk':
-        specifier: ^0.1.16
-        version: 0.1.29(graphql@16.13.1)
+        specifier: ^0.2.0
+        version: 0.2.0(graphql@16.13.1)
       '@rool-dev/svelte':
-        specifier: ^0.1.12
-        version: 0.1.18(graphql@16.13.1)(svelte@5.53.7)
+        specifier: ^0.2.0
+        version: 0.2.0(graphql@16.13.1)(svelte@5.53.7)
       '@tailwindcss/typography':
         specifier: ^0.5.19
         version: 0.5.19(tailwindcss@4.2.1)
@@ -380,11 +380,11 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@rool-dev/sdk@0.1.29':
-    resolution: {integrity: sha512-4UCSdt3pFuNgyKn2+hDo6JUy/u+oOLrv2OtOZ1Kz9eRben6rCROWZa1VzdI7L00gp4QxgSZL/hOTOKPdxlSF+w==}
+  '@rool-dev/sdk@0.2.0':
+    resolution: {integrity: sha512-dizC8XPUh7aIsf4rGMcqa9wyu4fMydULRsv9PllgO+1P0IkiDkSdubdxDcNo90qeT8gd8wdENmoeQxpkSOkglA==}
 
-  '@rool-dev/svelte@0.1.18':
-    resolution: {integrity: sha512-Ww5OA1k3ZBs/6ylDiHS9inQrbA/mCNAyo3IgLnq1T7/lRw0PhvwU+UsoKdLuyDprIlYFvBiNN3RPJKMaTqa8tw==}
+  '@rool-dev/svelte@0.2.0':
+    resolution: {integrity: sha512-DkNTE4Qr5siYGywLZL21wSx2ylMIdWxEb6Oa8Ql2e2QCPtcwk09M5kRfVSem3CUepla9LBfe1wzFNGnn1jK+dg==}
     peerDependencies:
       svelte: ^5.0.0
 
@@ -1115,7 +1115,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.59.0':
     optional: true
 
-  '@rool-dev/sdk@0.1.29(graphql@16.13.1)':
+  '@rool-dev/sdk@0.2.0(graphql@16.13.1)':
     dependencies:
       fflate: 0.8.2
       graphql-sse: 2.6.0(graphql@16.13.1)
@@ -1124,9 +1124,9 @@ snapshots:
     transitivePeerDependencies:
       - graphql
 
-  '@rool-dev/svelte@0.1.18(graphql@16.13.1)(svelte@5.53.7)':
+  '@rool-dev/svelte@0.2.0(graphql@16.13.1)(svelte@5.53.7)':
     dependencies:
-      '@rool-dev/sdk': 0.1.29(graphql@16.13.1)
+      '@rool-dev/sdk': 0.2.0(graphql@16.13.1)
       svelte: 5.53.7
     transitivePeerDependencies:
       - graphql
