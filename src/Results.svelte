@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { ReactiveSpace, Rool } from '@rool-dev/svelte';
+  import type { ReactiveChannel, Rool } from '@rool-dev/svelte';
   import type { Question, Answer } from './types';
   import { checkAnswer } from './checkAnswer';
   import RichText from './RichText.svelte';
 
   interface Props {
-    space: ReactiveSpace;
+    channel: ReactiveChannel;
     rool: Rool;
     questions: Question[];
     answers: Answer[];
@@ -13,7 +13,8 @@
     onRestart: () => void;
   }
 
-  let { space, rool, questions, answers, quizId, onRestart }: Props = $props();
+  let { channel, rool, questions, answers, quizId, onRestart }: Props =
+    $props();
 
   // Score each question
   let results = $derived(
@@ -73,7 +74,7 @@
           : { given: r.userAnswer, expected: r.correctAnswer }),
       })),
     };
-    await space.createObject({ data: attemptData });
+    await channel.createObject({ data: attemptData });
 
     // Build a summary for the AI
     const wrongSummary = results
@@ -91,8 +92,8 @@
 
     aiLoading = true;
     try {
-      await space.checkpoint();
-      await space.prompt(
+      await channel.checkpoint();
+      await channel.prompt(
         `The student just completed a quiz and scored ${score}/${total}.\n\nTopic breakdown: ${topicSummary}\n\n${
           wrongSummary
             ? `Questions they got wrong:\n${wrongSummary}`
@@ -101,7 +102,7 @@
       );
 
       // Get the latest interaction for the feedback text
-      const interactions = space.interactions;
+      const interactions = channel.interactions;
       const latest = interactions[interactions.length - 1];
       if (latest?.output) {
         aiFeedback = latest.output;

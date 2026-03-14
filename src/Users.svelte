@@ -1,13 +1,14 @@
 <script lang="ts">
-  import type { ReactiveSpace, Rool } from '@rool-dev/svelte';
+  import type { ReactiveChannel, Rool, RoolSpace } from '@rool-dev/svelte';
   import type { SpaceMember, RoolUserRole, LinkAccess } from '@rool-dev/sdk';
 
   interface Props {
-    space: ReactiveSpace;
+    space: RoolSpace | null;
+    channel: ReactiveChannel;
     rool: Rool;
   }
 
-  let { space, rool }: Props = $props();
+  let { space, channel, rool }: Props = $props();
 
   // Member list
   let members = $state<SpaceMember[]>([]);
@@ -24,16 +25,16 @@
   // Remove user
   let removingUserId = $state<string | null>(null);
 
-  // Link access — derived from space, with local override after updates
+  // Link access — derived from channel, with local override after updates
   let linkAccessOverride = $state<LinkAccess | null>(null);
-  let currentLinkAccess = $derived(linkAccessOverride ?? space.linkAccess);
+  let currentLinkAccess = $derived(linkAccessOverride ?? channel.linkAccess);
   let settingLinkAccess = $state(false);
 
   async function loadMembers() {
     loadingMembers = true;
     membersError = null;
     try {
-      members = await space.listUsers();
+      members = await space!.listUsers();
     } catch (e) {
       membersError = e instanceof Error ? e.message : 'Failed to load members';
     } finally {
@@ -65,7 +66,7 @@
         return;
       }
 
-      await space.addUser(user.id, selectedRole);
+      await space!.addUser(user.id, selectedRole);
       addSuccess = `Added ${user.email} as ${selectedRole}.`;
       emailInput = '';
       selectedRole = 'editor';
@@ -80,7 +81,7 @@
   async function removeUser(userId: string) {
     removingUserId = userId;
     try {
-      await space.removeUser(userId);
+      await space!.removeUser(userId);
       await loadMembers();
     } catch (e) {
       membersError = e instanceof Error ? e.message : 'Failed to remove user';
@@ -92,7 +93,7 @@
   async function handleLinkAccess(value: LinkAccess) {
     settingLinkAccess = true;
     try {
-      await space.setLinkAccess(value);
+      await space!.setLinkAccess(value);
       linkAccessOverride = value;
     } catch (e) {
       membersError =

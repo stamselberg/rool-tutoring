@@ -1,7 +1,7 @@
 <script lang="ts">
   import type {
-    ReactiveSpace,
-    ReactiveCollection,
+    ReactiveChannel,
+    ReactiveWatch,
     RoolObject,
   } from '@rool-dev/svelte';
   import type { Question, Quiz, Attempt } from './types';
@@ -12,15 +12,15 @@
   import SvgDiagramView from './objects/SvgDiagramView.svelte';
 
   interface Props {
-    space: ReactiveSpace;
+    channel: ReactiveChannel;
   }
 
-  let { space }: Props = $props();
+  let { channel }: Props = $props();
 
-  let collection = $state<ReactiveCollection | null>(null);
+  let collection = $state<ReactiveWatch | null>(null);
 
   $effect(() => {
-    const c = space.collection({});
+    const c = channel.watch({});
     collection = c;
     return () => c.close();
   });
@@ -113,7 +113,7 @@
           {#if openGroups[group.key]}
             <div class="pb-1">
               {#each group.items as obj (obj.id)}
-                <ObjectRow {obj} {space}>
+                <ObjectRow {obj} {channel}>
                   {#snippet view()}
                     {#if obj.type === 'quiz'}
                       <QuizView quiz={obj as unknown as Quiz} />

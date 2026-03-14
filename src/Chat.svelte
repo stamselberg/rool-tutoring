@@ -1,19 +1,28 @@
 <script lang="ts">
-  import type { ReactiveSpace } from '@rool-dev/svelte';
+  import type { ReactiveChannel, Interaction } from '@rool-dev/svelte';
   import RichText from './RichText.svelte';
-  import ChatDiagramPreviews from './ChatDiagramPreviews.svelte';
+  import DiagramPreviews from './DiagramPreviews.svelte';
+  import DiagramSummaries from './DiagramSummaries.svelte';
 
   interface Props {
-    space: ReactiveSpace;
+    channel: ReactiveChannel;
   }
 
-  let { space }: Props = $props();
+  let { channel }: Props = $props();
 
   let input = $state('');
   let isSending = $state(false);
   let messagesEl: HTMLElement | null = $state(null);
 
-  let interactions = $derived(space.interactions);
+  let interactions = $derived(channel.interactions);
+
+  // Find the last interaction that created/modified objects (for full preview)
+  let latestDiagramMsgId = $derived.by(() => {
+    for (let i = interactions.length - 1; i >= 0; i--) {
+      if (interactions[i].modifiedObjectIds?.length) return interactions[i].id;
+    }
+    return null;
+  });
 
   // Auto-scroll on new messages
   $effect(() => {
@@ -30,8 +39,8 @@
     isSending = true;
 
     try {
-      await space.checkpoint();
-      await space.prompt(text);
+      await channel.checkpoint();
+      await channel.prompt(text);
     } finally {
       isSending = false;
     }
@@ -75,7 +84,15 @@
               <p class="text-sm text-gray-400 italic">Thinking...</p>
             {/if}
             {#if msg.modifiedObjectIds?.length}
-              <ChatDiagramPreviews {space} objectIds={msg.modifiedObjectIds} />
+              {#if msg.id === latestDiagramMsgId}
+                <DiagramPreviews {channel} objectIds={msg.modifiedObjectIds} />
+              {:else}
+                <DiagramSummaries
+                  {channel}
+                  objectIds={msg.modifiedObjectIds}
+                  toolCalls={msg.toolCalls}
+                />
+              {/if}
             {/if}
           </div>
         </div>

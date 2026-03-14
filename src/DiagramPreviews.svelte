@@ -1,12 +1,12 @@
 <script lang="ts">
-  import type { ReactiveSpace } from '@rool-dev/svelte';
+  import type { ReactiveChannel } from '@rool-dev/svelte';
 
   interface Props {
-    space: ReactiveSpace;
+    channel: ReactiveChannel;
     objectIds: string[];
   }
 
-  let { space, objectIds }: Props = $props();
+  let { channel, objectIds }: Props = $props();
 
   interface DiagramPreview {
     id: string;
@@ -16,10 +16,6 @@
 
   let previews = $state<DiagramPreview[]>([]);
 
-  function svgToBlobUrl(svg: string): string {
-    return URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
-  }
-
   $effect(() => {
     const ids = objectIds;
     if (!ids.length) return;
@@ -27,7 +23,7 @@
     let cancelled = false;
     const urls: string[] = [];
 
-    Promise.all(ids.map((id) => space.getObject(id))).then((objects) => {
+    Promise.all(ids.map((id) => channel.getObject(id))).then((objects) => {
       if (cancelled) return;
 
       const result: DiagramPreview[] = [];
@@ -36,7 +32,9 @@
         const o = obj as Record<string, any>;
 
         if (o.type === 'svg_diagram' && typeof o.svgCode === 'string') {
-          const url = svgToBlobUrl(o.svgCode);
+          const url = URL.createObjectURL(
+            new Blob([o.svgCode], { type: 'image/svg+xml' }),
+          );
           urls.push(url);
           result.push({ id: o.id, title: o.title ?? 'Diagram', blobUrl: url });
         }
