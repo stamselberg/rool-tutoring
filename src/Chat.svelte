@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { ReactiveChannel, Interaction } from '@rool-dev/svelte';
   import RichText from './RichText.svelte';
-  import ChatDiagramPreviews from './ChatDiagramPreviews.svelte';
+  import DiagramPreviews from './DiagramPreviews.svelte';
+  import DiagramSummaries from './DiagramSummaries.svelte';
 
   interface Props {
     channel: ReactiveChannel;
@@ -83,12 +84,15 @@
               <p class="text-sm text-gray-400 italic">Thinking...</p>
             {/if}
             {#if msg.modifiedObjectIds?.length}
-              <ChatDiagramPreviews
-                {channel}
-                objectIds={msg.modifiedObjectIds}
-                toolCalls={msg.toolCalls}
-                isLatest={msg.id === latestDiagramMsgId}
-              />
+              {#if msg.id === latestDiagramMsgId}
+                <DiagramPreviews {channel} objectIds={msg.modifiedObjectIds} />
+              {:else}
+                <DiagramSummaries
+                  {channel}
+                  objectIds={msg.modifiedObjectIds}
+                  toolCalls={msg.toolCalls}
+                />
+              {/if}
             {/if}
           </div>
         </div>
