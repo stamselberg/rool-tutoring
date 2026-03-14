@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { ReactiveSpace } from '@rool-dev/svelte';
+  import type { ReactiveChannel } from '@rool-dev/svelte';
   import type { Question, Answer } from './types';
   import RichText from './RichText.svelte';
 
   interface Props {
-    space: ReactiveSpace;
+    channel: ReactiveChannel;
     question: Question;
     index: number;
     total: number;
@@ -12,7 +12,7 @@
     onAnswer: (value: Answer) => void;
   }
 
-  let { space, question, index, total, answer, onAnswer }: Props = $props();
+  let { channel, question, index, total, answer, onAnswer }: Props = $props();
 
   // Resolve diagram source: SVG string, media URL, or object ID reference
   let diagramSrc = $state<string | null>(null);
@@ -40,7 +40,7 @@
 
     if (ref.startsWith('http')) {
       // Media URL — fetch with auth
-      space.fetchMedia(ref).then(async (res) => {
+      channel.fetchMedia(ref).then(async (res) => {
         if (cancelled) return;
         const blob = await res.blob();
         if (cancelled) return;
@@ -48,7 +48,7 @@
       });
     } else {
       // Object ID — fetch the referenced object for its svgCode
-      space.getObject(ref).then((obj) => {
+      channel.getObject(ref).then((obj) => {
         if (cancelled || !obj) return;
         const svg = (obj as Record<string, any>).svgCode;
         if (typeof svg === 'string') {

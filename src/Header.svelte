@@ -1,20 +1,20 @@
 <script lang="ts">
-  import type { ReactiveSpace } from '@rool-dev/svelte';
+  import type { ReactiveChannel } from '@rool-dev/svelte';
 
   type Mode = 'chat' | 'quiz' | 'users';
 
   interface Props {
     appName: string;
-    space: ReactiveSpace | null;
+    channel: ReactiveChannel | null;
     mode: Mode;
     onModeChange: (mode: Mode) => void;
     onLogout: () => void;
   }
 
-  let { appName, space, mode, onModeChange, onLogout }: Props = $props();
+  let { appName, channel, mode, onModeChange, onLogout }: Props = $props();
 
   let canManageUsers = $derived(
-    space != null && (space.role === 'owner' || space.role === 'admin'),
+    channel != null && (channel.role === 'owner' || channel.role === 'admin'),
   );
 
   $effect(() => {
@@ -30,7 +30,7 @@
   <h1 class="text-lg font-semibold text-gray-900">{appName}</h1>
 
   <div class="flex items-center gap-3">
-    {#if space}
+    {#if channel}
       <div class="flex bg-gray-100 rounded-lg p-0.5">
         <button
           class="px-3 py-1 text-sm font-medium rounded-md transition-colors {mode ===

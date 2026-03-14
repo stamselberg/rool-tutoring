@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { createRool, type ReactiveSpace } from '@rool-dev/svelte';
+  import {
+    createRool,
+    type ReactiveChannel,
+    type RoolSpace,
+  } from '@rool-dev/svelte';
   import Splash from './Splash.svelte';
   import Header from './Header.svelte';
   import Chat from './Chat.svelte';
@@ -14,16 +18,17 @@
   const rool = createRool();
   rool.init();
 
-  let space = $state<ReactiveSpace | null>(null);
+  let space = $state<RoolSpace | null>(null);
+  let channel = $state<ReactiveChannel | null>(null);
   let mode = $state<'chat' | 'quiz' | 'users'>('chat');
 
   let isAdmin = $derived(
-    space != null && (space.role === 'owner' || space.role === 'admin'),
+    channel != null && (channel.role === 'owner' || channel.role === 'admin'),
   );
 
   // Open space when ready
   $effect(() => {
-    if (rool.authenticated && rool.spaces && !space) {
+    if (rool.authenticated && rool.spaces && !channel) {
       openSpace();
     }
   });
@@ -32,18 +37,18 @@
     const spaces = rool.spaces!;
     const existing = spaces.find((s) => s.name === APP_NAME);
 
-    // Determine role before opening to pick the right conversation
+    // Determine role before opening to pick the right channel
     const role = existing?.role ?? 'owner';
     const admin = role === 'owner' || role === 'admin';
-    const conversationId = admin
-      ? 'tutoring'
-      : `student-${rool.currentUser?.id}`;
+    const channelId = admin ? 'tutoring' : `student-${rool.currentUser?.id}`;
 
     space = existing
-      ? await rool.openSpace(existing.id, { conversationId })
-      : await rool.createSpace(APP_NAME, { conversationId });
+      ? await rool.openSpace(existing.id)
+      : await rool.createSpace(APP_NAME);
 
-    await space.setSystemInstruction(
+    channel = await rool.openChannel(space.id, channelId);
+
+    await channel.setSystemInstruction(
       admin ? SYSTEM_INSTRUCTION : STUDENT_INSTRUCTION,
     );
   }
@@ -59,13 +64,13 @@
   <div class="min-h-dvh flex flex-col bg-gray-50">
     <Header
       appName={APP_NAME}
-      {space}
+      {channel}
       {mode}
       onModeChange={(m) => (mode = m)}
       onLogout={() => rool.logout()}
     />
 
-    {#if !space}
+    {#if !channel}
       <div class="flex-1 flex items-center justify-center">
         <p class="text-gray-500">Loading space...</p>
       </div>
@@ -74,16 +79,16 @@
         <div
           class="flex-1 flex overflow-x-auto snap-x snap-mandatory md:overflow-visible min-h-0"
         >
-          <Chat {space} />
-          <Objects {space} />
+          <Chat {channel} />
+          <Objects {channel} />
         </div>
       {:else}
-        <Chat {space} />
+        <Chat {channel} />
       {/if}
     {:else if mode === 'users'}
-      <Users {space} {rool} />
+      <Users {space} {rool} {channel} />
     {:else}
-      <QuizFlow {space} {rool} />
+      <QuizFlow {channel} {rool} />
     {/if}
   </div>
 {/if}

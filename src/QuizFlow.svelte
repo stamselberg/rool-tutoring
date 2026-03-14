@@ -1,19 +1,15 @@
 <script lang="ts">
-  import type {
-    ReactiveSpace,
-    ReactiveCollection,
-    Rool,
-  } from '@rool-dev/svelte';
+  import type { ReactiveChannel, ReactiveWatch, Rool } from '@rool-dev/svelte';
   import type { Question, Answer, Quiz } from './types';
   import QuestionScreen from './QuestionScreen.svelte';
   import Results from './Results.svelte';
 
   interface Props {
-    space: ReactiveSpace;
+    channel: ReactiveChannel;
     rool: Rool;
   }
 
-  let { space, rool }: Props = $props();
+  let { channel, rool }: Props = $props();
 
   // Quiz state
   let phase = $state<'idle' | 'active' | 'results'>('idle');
@@ -21,11 +17,11 @@
   let answers = $state<Answer[]>([]);
   let selectedQuizId = $state<string | null>(null);
 
-  // Reactive collection — all objects in the space
-  let collection = $state<ReactiveCollection | null>(null);
+  // Reactive watch — all objects in the space
+  let collection = $state<ReactiveWatch | null>(null);
 
   $effect(() => {
-    const c = space.collection({});
+    const c = channel.watch({});
     collection = c;
     return () => c.close();
   });
@@ -172,7 +168,7 @@
     <div class="flex-1">
       {#key currentIndex}
         <QuestionScreen
-          {space}
+          {channel}
           question={activeQuestions[currentIndex]}
           index={currentIndex}
           total={activeQuestions.length}
@@ -210,7 +206,7 @@
 {:else}
   <div class="flex-1 overflow-y-auto">
     <Results
-      {space}
+      {channel}
       {rool}
       questions={activeQuestions}
       {answers}

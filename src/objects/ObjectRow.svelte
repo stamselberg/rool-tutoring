@@ -1,17 +1,17 @@
 <script lang="ts">
-  import type { ReactiveSpace, RoolObject } from '@rool-dev/svelte';
+  import type { ReactiveChannel, RoolObject } from '@rool-dev/svelte';
   import type { Snippet } from 'svelte';
   import { formatTime, objectSummary } from './utils';
   import RichText from '../RichText.svelte';
 
   interface Props {
     obj: RoolObject;
-    space: ReactiveSpace;
+    channel: ReactiveChannel;
     /** Rendered view snippet for known types. If omitted, only raw JSON is shown. */
     view?: Snippet;
   }
 
-  let { obj, space, view }: Props = $props();
+  let { obj, channel, view }: Props = $props();
 
   let expanded = $state(false);
   let isRaw = $state(false);
@@ -26,9 +26,7 @@
     expanded = !expanded;
     if (expanded && !statLoaded) {
       statLoaded = true;
-      space.stat(obj.id).then((s) => {
-        stat = s ?? null;
-      });
+      stat = channel.stat(obj.id) ?? null;
     }
   }
 </script>

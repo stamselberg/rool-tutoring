@@ -12,11 +12,11 @@ importers:
         specifier: ^1.0.3
         version: 1.0.3(svelte@5.53.7)
       '@rool-dev/sdk':
-        specifier: ^0.2.0
-        version: 0.2.0(graphql@16.13.1)
+        specifier: ^0.3.0
+        version: 0.3.0(graphql@16.13.1)
       '@rool-dev/svelte':
-        specifier: ^0.2.0
-        version: 0.2.0(graphql@16.13.1)(svelte@5.53.7)
+        specifier: ^0.3.0
+        version: 0.3.0(graphql@16.13.1)(svelte@5.53.7)
       '@tailwindcss/typography':
         specifier: ^0.5.19
         version: 0.5.19(tailwindcss@4.2.1)
@@ -380,11 +380,11 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@rool-dev/sdk@0.2.0':
-    resolution: {integrity: sha512-dizC8XPUh7aIsf4rGMcqa9wyu4fMydULRsv9PllgO+1P0IkiDkSdubdxDcNo90qeT8gd8wdENmoeQxpkSOkglA==}
+  '@rool-dev/sdk@0.3.0':
+    resolution: {integrity: sha512-4MEe1llbB/X9ynXQ6XkrNzwm1qvZXpHMXDj8SxN6eH+zJh9q1+AAW21Qa8yBGgQG5hg8miY1VTWb78PpfiBmsw==}
 
-  '@rool-dev/svelte@0.2.0':
-    resolution: {integrity: sha512-DkNTE4Qr5siYGywLZL21wSx2ylMIdWxEb6Oa8Ql2e2QCPtcwk09M5kRfVSem3CUepla9LBfe1wzFNGnn1jK+dg==}
+  '@rool-dev/svelte@0.3.0':
+    resolution: {integrity: sha512-TIhq9zPlv2BTqC/OmnVZwn6+LadCzXiuQtVAF+A9PT6iHiP0DD9ip4y4/vNyZav2hKOOuHZ1xxB95Togp7AnsQ==}
     peerDependencies:
       svelte: ^5.0.0
 
@@ -650,9 +650,6 @@ packages:
 
   htmlparser2@10.1.0:
     resolution: {integrity: sha512-VTZkM9GWRAtEpveh7MSF6SjjrpNVNNVJfFup7xTY3UpFtm67foy9HDVXneLtFVt4pMz5kZtgNcvCniNFb1hlEQ==}
-
-  immutable-json-patch@6.0.2:
-    resolution: {integrity: sha512-KwCA5DXJiyldda8SPha1zB+6+vbEi5/jRRcYii/6yFXlyu9ZjiSH/wPq8Ri2Hk8iGjjTMcHW3Z21S4MOpl7sOw==}
 
   is-docker@3.0.0:
     resolution: {integrity: sha512-eljcgEDlEns/7AXFosB5K/2nCM4P7FQPkGc/DWLy5rmFEWvZayGrik1d9/QIY5nJ4f9YsVvBkA6kJpHn9rISdQ==}
@@ -1115,18 +1112,17 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.59.0':
     optional: true
 
-  '@rool-dev/sdk@0.2.0(graphql@16.13.1)':
+  '@rool-dev/sdk@0.3.0(graphql@16.13.1)':
     dependencies:
       fflate: 0.8.2
       graphql-sse: 2.6.0(graphql@16.13.1)
-      immutable-json-patch: 6.0.2
       open: 11.0.0
     transitivePeerDependencies:
       - graphql
 
-  '@rool-dev/svelte@0.2.0(graphql@16.13.1)(svelte@5.53.7)':
+  '@rool-dev/svelte@0.3.0(graphql@16.13.1)(svelte@5.53.7)':
     dependencies:
-      '@rool-dev/sdk': 0.2.0(graphql@16.13.1)
+      '@rool-dev/sdk': 0.3.0(graphql@16.13.1)
       svelte: 5.53.7
     transitivePeerDependencies:
       - graphql
@@ -1360,8 +1356,6 @@ snapshots:
       domhandler: 5.0.3
       domutils: 3.2.2
       entities: 7.0.1
-
-  immutable-json-patch@6.0.2: {}
 
   is-docker@3.0.0: {}
 
